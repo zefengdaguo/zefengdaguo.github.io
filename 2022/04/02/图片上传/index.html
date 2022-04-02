@@ -9,7 +9,7 @@
     
     <title>
         
-            Archive: 2021/7 |
+            图片上传 |
         
         Zefengdaguo&#39;s Blog
     </title>
@@ -67,7 +67,7 @@
                         </li>
                     
                         <li class="menu-item">
-                            <a class="active"
+                            <a class=""
                                href="/archives"
                             >
                                 ARCHIVES
@@ -101,7 +101,7 @@
                 </li>
             
                 <li class="drawer-menu-item flex-center">
-                    <a class="active"
+                    <a class=""
                        href="/archives">ARCHIVES</a>
                 </li>
             
@@ -121,48 +121,112 @@
 
                 
                     <div class="fade-in-down-animation">
-    <div class="archive-container ">
+    <div class="article-content-container">
+
+        <div class="article-title">
+            <span class="title-hover-animation">图片上传</span>
+        </div>
+
         
-<div class="archive-list-container">
+            <div class="article-header">
+                <div class="avatar">
+                    <img src="/images/mylogo.svg">
+                </div>
+                <div class="info">
+                    <div class="author">
+                        <span class="name">zefengdaguo</span>
+                        
+                            <span class="author-label">Lv1</span>
+                        
+                    </div>
+                    <div class="meta-info">
+                        <div class="article-meta-info">
+    <span class="article-date article-meta-item">
+        <i class="fas fa-edit"></i>&nbsp;2022-04-02 16:45:48
+    </span>
     
-        <section class="archive-item">
-            <div class="archive-item-header">
-                <span class="archive-year">2022</span>
-                <span class="archive-year-post-count">[1]</span>
-            </div>
-            <ul class="article-list">
-                
-                    <li class="article-item">
-                        <a class="article-title"
-                           href="/2022/04/02/%E5%9B%BE%E7%89%87%E4%B8%8A%E4%BC%A0/"
-                        >图片上传</a>
-                        <span class="article-date">04-02</span>
-                    </li>
-                
-            </ul>
-        </section>
     
-        <section class="archive-item">
-            <div class="archive-item-header">
-                <span class="archive-year">2021</span>
-                <span class="archive-year-post-count">[1]</span>
-            </div>
-            <ul class="article-list">
-                
-                    <li class="article-item">
-                        <a class="article-title"
-                           href="/2021/07/18/hexo%E9%83%A8%E7%BD%B2%E8%AE%B0%E5%BD%95/"
-                        >hexo部署记录</a>
-                        <span class="article-date">07-18</span>
-                    </li>
-                
-            </ul>
-        </section>
+
+    
+    
+    
+    
+        <span class="article-pv article-meta-item">
+            <i class="fas fa-eye"></i>&nbsp;<span id="busuanzi_value_page_pv"></span>
+        </span>
     
 </div>
 
+                    </div>
+                </div>
+            </div>
+        
+
+        <div class="article-content markdown-body">
+            <h1 id="格式验证"><a href="#格式验证" class="headerlink" title="格式验证"></a>格式验证</h1><p>用户在上传图片后，需要对文件类型进行校验，通常方法有：</p>
+<ul>
+<li>文件名验证：获取上传文件的扩展名，判断是否为图片格式，可以放在前端验证，仅作为表单提交时的提醒；</li>
+<li>获取文件的 Content-type；</li>
+<li>文件流验证：因为扩展名和 Content-type 是可修改的，为了防止上传恶意文件，需要读取二进制文件流判断文件格式。</li>
+</ul>
+<p>通过二进制查看器可以看到各类文件的文件头，hexdump 是 vscode 的一个二进制文件查看插件：</p>
+<p>png格式文件，头部信息是<code>89504E47</code></p>
+<p><img src="https://raw.githubusercontent.com/zefengdaguo/imgs/master/image-20220402155925016.png"></p>
+<p>jpg头部信息是<code>FFD8FF</code></p>
+<p><img src="https://raw.githubusercontent.com/zefengdaguo/imgs/master/image-20220402160139749.png"></p>
+<p>gif头部信息是<code>474946</code></p>
+<p><img src="https://raw.githubusercontent.com/zefengdaguo/imgs/master/image-20220402160239722.png"></p>
+<p>依此可以编写程序，用 map 存储各类文件的头部信息，也有现成的工具库，Hutool 的 <code>FileTypeUtil</code>提供了文件流验证的方法：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> Result <span class="title">uploadImage</span><span class="params">(MultipartFile file, Type type)</span> </span>&#123;</span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">    String filetype = FileTypeUtil.getType(file.getInputStream());</span><br><span class="line">    <span class="keyword">if</span>(!filetype.equals(<span class="string">&quot;jpg&quot;</span>)&amp;&amp;!filetype.equals(<span class="string">&quot;png&quot;</span>)&amp;&amp;!filetype.equals(<span class="string">&quot;gif&quot;</span>))</span><br><span class="line">        <span class="keyword">return</span> Result.fail(<span class="string">&quot;请上传格式为jpg,png,gif的图片&quot;</span>);</span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">    <span class="comment">// return ...</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h1 id="图片压缩"><a href="#图片压缩" class="headerlink" title="图片压缩"></a>图片压缩</h1><p>但即使是文件头部也是可以伪造的，最好不要将用户提交的原文件存储在服务器上。</p>
+<p>图片上传还有一个压缩的需求，这样的好处有：</p>
+<ul>
+<li>擦除文件中的敏感信息（如拍摄地点等）；</li>
+<li>减轻以后的网络流量。</li>
+</ul>
+<p>压缩方式有：</p>
+<ul>
+<li>前端 canvas 压缩；</li>
+<li>CDN 压缩服务；</li>
+<li>后端压缩后再存储到资源服务器上。</li>
+</ul>
+<p>前端压缩无法完全保证安全，后端压缩对服务器的要求较高，可以两者配合，前端压缩后若文件还是过大，后端再进一步压缩，但也不能过度压缩导致图片失真。</p>
+<p>Thumbnails 库提供了图片压缩的方法：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Thumbnails.of(filepath)</span><br><span class="line">    .scale(<span class="number">1f</span>)  <span class="comment">// 不缩放</span></span><br><span class="line">    .outputQuality(<span class="number">0.7F</span>)    <span class="comment">// 原图品质（0-1）</span></span><br><span class="line">    .toFile(path + <span class="string">&quot;/&quot;</span> + filename);</span><br></pre></td></tr></table></figure>
+
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p><a class="link"   target="_blank" rel="noopener" href="https://juejin.cn/post/6844904082046451719" >前端实现压缩图片功能<i class="fas fa-external-link-alt"></i></a></p>
+
+        </div>
+
+        
+
+        
+            <div class="article-nav">
+                
+                
+                    <div class="article-next">
+                        <a class="next"
+                           rel="next"
+                           href="/2021/07/18/hexo%E9%83%A8%E7%BD%B2%E8%AE%B0%E5%BD%95/"
+                        >
+                            <span class="title flex-center">
+                                <span class="post-nav-title-item">hexo部署记录</span>
+                                <span class="post-nav-item">Next posts</span>
+                            </span>
+                            <span class="right arrow-icon flex-center">
+                              <i class="fas fa-chevron-right"></i>
+                            </span>
+                        </a>
+                    </div>
+                
+            </div>
+        
+
+        
     </div>
 </div>
+
 
                 
             </div>
@@ -204,6 +268,23 @@
         </div>
     </div>
 
+    
+        <div class="post-tools">
+            <div class="post-tools-container">
+    <ul class="tools-list">
+        <!-- TOC aside toggle -->
+        
+            <li class="tools-item page-aside-toggle">
+                <i class="fas fa-outdent"></i>
+            </li>
+        
+
+        <!-- go comment -->
+        
+    </ul>
+</div>
+
+        </div>
     
 
     <div class="right-bottom-side-tools">
@@ -249,6 +330,14 @@
 
     </div>
 
+    
+        <aside class="page-aside">
+            <div class="post-toc-wrap">
+    <div class="post-toc">
+        <ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%A0%BC%E5%BC%8F%E9%AA%8C%E8%AF%81"><span class="nav-number">1.</span> <span class="nav-text">格式验证</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%9B%BE%E7%89%87%E5%8E%8B%E7%BC%A9"><span class="nav-number">2.</span> <span class="nav-text">图片压缩</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%8F%82%E8%80%83"><span class="nav-number">3.</span> <span class="nav-text">参考</span></a></li></ol>
+    </div>
+</div>
+        </aside>
     
 
     <div class="image-viewer-container">
@@ -314,6 +403,14 @@
 
 
 <div class="post-scripts">
+    
+        
+<script src="/js/left-side-toggle.js"></script>
+
+<script src="/js/libs/anime.min.js"></script>
+
+<script src="/js/toc.js"></script>
+
     
 </div>
 
